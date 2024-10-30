@@ -1,0 +1,19 @@
+--- 
+default:
+  image: $CI_REGISTRY/group/project/docker:20.10.16
+  services:
+    - name: $CI_REGISTRY/group/project/docker:20.10.16-dind
+      alias: docker
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
+
+stages:
+  - build
+
+build:
+  stage: build
+  variables:
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  script:
+    - docker build -t $IMAGE_TAG .
+    - docker push $IMAGE_TAG
