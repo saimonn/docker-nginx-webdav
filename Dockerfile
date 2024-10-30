@@ -1,21 +1,17 @@
 FROM nginx:latest
 
-LABEL maintainer="maltokyo"
-
-RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y nginx-extras apache2-utils
-
+LABEL maintainer="saimonn"
 
 COPY webdav.conf /etc/nginx/conf.d/default.conf
-RUN rm /etc/nginx/sites-enabled/*
+COPY entrypoint.sh /
 
-
-RUN mkdir -p "/media/data"
-
-RUN chown -R www-data:www-data "/media/data"
+RUN apt-get update && apt-get -y dist-upgrade   && \
+  apt-get install -y nginx-extras apache2-utils && \
+  rm /etc/nginx/sites-enabled/*                 && \
+  mkdir -p "/media/data"                        && \
+  chown -R www-data:www-data "/media/data"      && \
+  chmod +x entrypoint.sh
 
 VOLUME /media/data
 
-
-COPY entrypoint.sh /
-RUN chmod +x entrypoint.sh
-CMD /entrypoint.sh && nginx -g "daemon off;"
+CMD /entrypoint.sh
